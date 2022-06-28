@@ -1,5 +1,6 @@
 package stack;
 
+import java.util.Arrays;
 import java.util.Stack;
 
 public class StackQuestions {
@@ -131,81 +132,76 @@ public class StackQuestions {
     }
 
     public static int findMinimumCost(String str) {
-
-        // odd condition
-        if (str.length() % 2 == 1) {
-            return -1;
-        }
-
-        Stack<Character> stack = new Stack<>();
-        for (int i = 0; i < str.length(); i++) {
-            char ch = str.charAt(i);
-
-            if (ch == '{')
-                stack.push(ch);
-            else {
-                // ch is closed brace
-                if (!stack.empty() && stack.peek() == '{') {
+        if(str.length()%2 ==1) return -1;
+		Stack<Character> stack = new Stack<>();
+        for(char ch : str.toCharArray()) {
+            if(ch == '{') {
+               stack.push(ch); 
+            } else {
+                if(!stack.isEmpty() && stack.peek() == '{') {
                     stack.pop();
                 } else {
                     stack.push(ch);
                 }
             }
         }
-
-        // stack contains invalid expression
-        int a = 0, b = 0;
-        while (!stack.isEmpty()) {
-            if (stack.peek() == '{') {
-                b++;
-            } else {
-                a++;
-            }
-            stack.pop();
-        }
-
-        int ans = (a + 1) / 2 + (b + 1) / 2;
-        return ans;
+        int opened = 0, closed = 0;
+        while(!stack.isEmpty()) {
+            if(stack.pop() == '{')
+                opened++;
+            else
+                closed++;
+        }       
+        return (opened + 1)/2  + (closed + 1)/2;
     }
 
-    private static int[] nextSmallerElement(int[] arr, int n) {
+    private static int[] nextSmallerElement(int[] arr) {
         Stack<Integer> stack = new Stack<>();
         stack.push(-1);
+        int n = arr.length;
         int[] ans = new int[n];
 
         for (int i = n - 1; i >= 0; i--) {
             int currHeight = arr[i];
-            while (stack.peek() != -1 && arr[stack.peek()] >= currHeight) {
+            while (stack.peek() >= currHeight) {
                 stack.pop();
             }
-            // ans is stack ka top
             ans[i] = stack.peek();
-            stack.push(i);
+            stack.push(currHeight);
         }
         return ans;
     }
 
-    private static int[] prevSmallerElement(int[] arr, int n) {
+    private static int[] prevSmallerElement(int[] arr) {
         Stack<Integer> stack = new Stack<>();
         stack.push(-1);
+        int n = arr.length;
         int[] ans = new int[n];
 
         for (int i = 0; i < n; i++) {
             int currHeight = arr[i];
-            while (stack.peek() != -1 && arr[stack.peek()] >= currHeight) {
+            while (stack.peek() >= currHeight) {
                 stack.pop();
             }
-            // ans is stack ka top
             ans[i] = stack.peek();
-            stack.push(i);
+            stack.push(currHeight);
         }
         return ans;
     }
 
+    public static void main(String[] args) {
+        int[] input = { 2, 7, 3, 5, 4, 6, 8};
+        int []result = nextSmallerElement(input);
+        System.out.println("Next Smaller Elements are " + Arrays.toString(result));
+
+        result = prevSmallerElement(input);
+        System.out.println("Prev Smaller Elements are " + Arrays.toString(result));
+    }
+
     public static int largestRectangleArea(int[] heights) {
         int n = heights.length;
-        int[] next = nextSmallerElement(heights, n);
-        int[] prev = prevSmallerElement(heights, n);
+        int[] next = nextSmallerElement(heights);
+        int[] prev = prevSmallerElement(heights);
 
         int area = Integer.MIN_VALUE;
         for (int i = 0; i < n; i++) {
